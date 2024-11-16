@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace AbstractTrader
 {
-    public class TradeProcessorVersion1 : TradeProcessor
+    public class TradeProcessorVersion1 : ITradeProcessor
     {
-        protected override IEnumerable<string> ReadTradeData(Stream stream)
+
+        public void ProcessTrades(Stream stream)
+        {
+            var tradeData = ReadTradeData(stream);
+            var trades = ParseTrades(tradeData);
+            StoreTrades(trades);
+        }
+
+        protected IEnumerable<string> ReadTradeData(Stream stream)
         {
             LogMessage("INFO: ReadTradeData version 1");
             var tradeData = new List<string>();
@@ -25,7 +33,7 @@ namespace AbstractTrader
             return tradeData;
         }
 
-        protected override IEnumerable<TradeRecord> ParseTrades(IEnumerable<string> tradeData)
+        protected IEnumerable<TradeRecord> ParseTrades(IEnumerable<string> tradeData)
         {
             LogMessage("INFO: ParseTrades version 1");
             var trades = new List<TradeRecord>();
@@ -62,11 +70,16 @@ namespace AbstractTrader
             return trade;
         }
 
-        protected override void StoreTrades(IEnumerable<TradeRecord> trades)
+        protected void StoreTrades(IEnumerable<TradeRecord> trades)
         {
             LogMessage("INFO: Simulating database connection in StoreTrades");
             // Not really connecting to database in this sample
             LogMessage("INFO: {0} trades processed", trades.Count());
+        }
+
+        private void LogMessage(string message, params object[] args)
+        {
+            Console.WriteLine(message, args);
         }
 
     }
